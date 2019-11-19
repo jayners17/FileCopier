@@ -20,6 +20,7 @@ public class FileCopyGUI {
         frame.setLocationRelativeTo(null);
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setApproveButtonText("Copy");
+        fileChooser.setMultiSelectionEnabled(true);
 
         //Button is pressed
         fileChooser.addActionListener(new ActionListener() {
@@ -28,25 +29,37 @@ public class FileCopyGUI {
 
                 if (status == JFileChooser.APPROVE_OPTION) {
 
-                    //Creates an original file and copy file
-                    File selectedFile = fileChooser.getSelectedFile();
-                    try {
-                        original = new RandomAccessFile(selectedFile, "r");
-                        copy = new RandomAccessFile("COPY_" +selectedFile.getName(), "rw");
-                    } catch (FileNotFoundException e2) {
-                        e2.printStackTrace();
-                    }
+                    File[] files = fileChooser.getSelectedFiles();
 
-                    //Reads and writes bytes from original to copy file
-                    try {
-                        byte[] bytes = new byte[(int)original.length()];
-                        original.read(bytes);
-                        copy.write(bytes);
-                        copy.close();
-                        original.close();
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
+                    for (int i = 0; i < files.length; i++) {
+                        long startTime = System.nanoTime();
+
+                        //Creates an original file and copy file
+                        File selectedFile = files[i];
+                        try {
+                            original = new RandomAccessFile(selectedFile, "r");
+                            copy = new RandomAccessFile("COPY_" +selectedFile.getName(), "rw");
+                        } catch (FileNotFoundException e2) {
+                            e2.printStackTrace();
+                        }
+
+                        //Reads and writes bytes from original to copy file
+                        try {
+                            byte[] bytes = new byte[(int)original.length()];
+                            original.read(bytes);
+                            copy.write(bytes);
+
+                            long endTime = System.nanoTime();
+                            long duration = endTime - startTime;
+                            System.out.printf("File:\t%s%nSize:\t%d MB%nTime:\t%.4f seconds%n%n", selectedFile.getName(), original.length()/1000000, duration/10e8);
+
+                            copy.close();
+                            original.close();
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
                     }
+                    System.exit(0);
                 }
             }
         });
