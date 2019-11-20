@@ -82,6 +82,17 @@ public void append(int value) throws IOException
 	length++;
 }
 
+	public void append(byte value) throws IOException
+	{
+		if (full())
+		{
+			writeToFile();
+		}
+
+		buffer[currW++] = value;
+		length++;
+	}
+
 
 public int read()
 {
@@ -103,6 +114,14 @@ public int read()
 	return intValue;
 }
 
+public byte read(byte b){
+	if (empty())
+	{
+		fill();
+	}
+
+	return ((byte) Math.abs(buffer[currR++]));
+}
 
 public void clear() throws IOException
 {
