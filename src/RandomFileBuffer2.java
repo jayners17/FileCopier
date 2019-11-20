@@ -5,24 +5,24 @@ import java.io.EOFException;
 public class RandomFileBuffer2
 {
 
-private RandomAccessFile file;
-private String name;
-private int BUFFER_SIZE;
-private int length;
-private byte [] buffer;
-private int currR;
-private int currW;
-
-
-public RandomFileBuffer2(RandomAccessFile file, int size, String name) {
-	this.file = file;
-	BUFFER_SIZE = size;
-	buffer = new byte[BUFFER_SIZE*4];
-	length = 0;
-	currR = 0;
-	currW = 0;
-	this.name = name;
-}
+	private RandomAccessFile file;
+	private String name;
+	private int BUFFER_SIZE;
+	private int length;
+	private byte [] buffer;
+	private int currR;
+	private int currW;
+	
+	
+	public RandomFileBuffer2(RandomAccessFile file, int size, String name) {
+		this.file = file;
+		BUFFER_SIZE = size;
+		buffer = new byte[BUFFER_SIZE*4];
+		length = 0;
+		currR = 0;
+		currW = 0;
+		this.name = name;
+	}
 	
 // Fill empty buffer from File
 public void fill()
@@ -96,7 +96,7 @@ public void append(int value) throws IOException
 
 public int read()
 {
-	if (empty()) 
+	if (empty())
 	{
 		fill();
 	}
