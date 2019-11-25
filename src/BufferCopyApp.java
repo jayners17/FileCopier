@@ -56,6 +56,7 @@ public class BufferCopyApp extends Application {
 	
 	public void onConfirm(ActionEvent e){
 		if(browseHandler.hasSelection()){
+			//Open new copy Task on background thread
 			Thread t = new Thread(new CopyTask(browseHandler.getSelection()));
 			t.setDaemon(true);
 			t.start();

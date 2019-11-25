@@ -8,7 +8,6 @@ import java.util.List;
 public class CopyTask extends Task<Void> {
 	
 	private final List<File> src;
-	private ProgressDialog dialog;
 	
 	private long totalWork;
 	private double step;
@@ -22,9 +21,6 @@ public class CopyTask extends Task<Void> {
 		updateProgress(0.0, 1.0);
 		
 		step = 1.0 / totalWork;
-		
-		this.dialog = new ProgressDialog("Copying Files...", this);
-		this.dialog.show();
 	}
 	
 	@Override
@@ -42,36 +38,38 @@ public class CopyTask extends Task<Void> {
 				//Setup files and buffer
 				RandomAccessFile original = new RandomAccessFile(f, "r");
 				RandomAccessFile copy = new RandomAccessFile("COPY_" + f.getName(), "rw");
-				RandomFileBuffer2 buff = new RandomFileBuffer2(copy, 800, "Copy");
+				RandomFileBuffer2 buff = new RandomFileBuffer2(copy, 6400, "Copy");
 				
 				boolean isEOF = false;
 				
+				long startTime = System.currentTimeMillis();
+				
 				//Loop through each file
 				while(!isEOF){
-					byte[] readBuff = new byte[10];
+					
 					if(isCancelled()){
-						//Return immediately if canceled
+						//Return immediately if canceled and close files
 						updateMessage("Cancelled");
 						original.close();
 						copy.close();
 						return null;
 					}
 					try{
-						//Copy byte
-						original.read(readBuff);
-						for (int i = 0; i < readBuff.length; i++) {
-							buff.append(readBuff[1]);
-							progress += step;
-						}
-						Thread.sleep(1000);
-						
+						//Copy byte to buffer
+						buff.append(original.readByte());
+						progress += step;
+						//Free processor up for a bit
+						Thread.sleep(100);
 					}catch (EOFException e){
+						//Stop loop once eof is reached
 						isEOF = true;
+						//Flush buffer
+						buff.flush();
 					}
 				}
 				
-				//Flush buffer
-				buff.flush();
+				System.out.printf("[%s] Elapsed Time: %.2f second(s)", f.getName(), (startTime - System.currentTimeMillis()) / 10e8);
+				
 				//Close files
 				original.close();
 				copy.close();
@@ -105,14 +103,12 @@ public class CopyTask extends Task<Void> {
 		super.succeeded();
 		System.out.println("Copied Files!!");
 		updateMessage("Copying done!!");
-		dialog.close();
 	}
 	
 	@Override
 	protected void cancelled() {
 		super.cancelled();
 		updateMessage("Canceled");
-		dialog.close();
 	}
 	
 	@Override
