@@ -27,44 +27,33 @@ public class CopyTask extends Task<Void> {
 	protected Void call() throws Exception {
 		System.out.println("Started Copy");
 		double progress = 0;
+		System.out.println(src);
 		for (File f : src){
-			//Check if task is canceled
-			if(isCancelled()){
-				updateMessage("Cancelled");
-				return null;
-			}
-			updateMessage(String.format("File: %s", f.getName()));
 			try {
+				System.err.println();
+				
 				//Setup files and buffer
 				RandomAccessFile original = new RandomAccessFile(f, "r");
 				RandomAccessFile copy = new RandomAccessFile("COPY_" + f.getName(), "rw");
 				RandomFileBuffer2 buff = new RandomFileBuffer2(copy, 6400, "Copy");
 				
-				boolean isEOF = false;
-				
 				long startTime = System.currentTimeMillis();
 				
 				//Loop through each file
-				while(!isEOF){
+				while(true){
 					
-					if(isCancelled()){
-						//Return immediately if canceled and close files
-						updateMessage("Cancelled");
-						original.close();
-						copy.close();
-						return null;
-					}
 					try{
 						//Copy byte to buffer
 						buff.append(original.readByte());
-						progress += step;
+						System.out.println("Wrote Byte");
+						System.out.printf("Copy Progress: %.2f%%", getProgress() * 100);
 						//Free processor up for a bit
 						Thread.sleep(100);
 					}catch (EOFException e){
-						//Stop loop once eof is reached
-						isEOF = true;
 						//Flush buffer
 						buff.flush();
+						//Stop loop once eof is reached
+						break;
 					}
 				}
 				
@@ -76,7 +65,7 @@ public class CopyTask extends Task<Void> {
 				//Update task progress
 				updateProgress(progress, 1.0);
 				
-				System.out.printf("Copy Progress: %.2f%%", getProgress() * 100);
+				
 				
 				try{
 					Thread.sleep(100);
@@ -87,8 +76,6 @@ public class CopyTask extends Task<Void> {
 				}
 				
 			} catch (FileNotFoundException e) {
-				this.failed();
-			} catch (IOException e){
 				this.failed();
 			}
 		}

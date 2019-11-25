@@ -11,6 +11,11 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.EOFException;
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
 public class BufferCopyApp extends Application {
 	
 	private BrowseHandler browseHandler;
@@ -54,13 +59,47 @@ public class BufferCopyApp extends Application {
 		primaryStage.show();
 	}
 	
-	public void onConfirm(ActionEvent e){
-		if(browseHandler.hasSelection()){
-			//Open new copy Task on background thread
-			Thread t = new Thread(new CopyTask(browseHandler.getSelection()));
-			t.setDaemon(true);
-			t.start();
+	public void onConfirm(ActionEvent e) {
+		if (browseHandler.hasSelection()) {
+			
+			for (File f : browseHandler.getSelection()) {
+				try {
+					System.err.println();
+					
+					//Setup files and buffer
+					RandomAccessFile original = new RandomAccessFile(f, "r");
+					RandomAccessFile copy = new RandomAccessFile("COPY_" + f.getName(), "rw");
+					RandomFileBuffer2 buff = new RandomFileBuffer2(copy, 6400, "Copy");
+					
+					long startTime = System.currentTimeMillis();
+					
+					//Loop through each file
+					while (true) {
+						try {
+							//Copy byte to buffer
+							buff.append(original.readByte());
+						} catch (EOFException eof) {
+							//Flush buffer
+							buff.flush();
+							//Stop loop once eof is reached
+							break;
+						}
+					}
+					
+					System.out.printf("[%s] Elapsed Time: %.2f second(s)", f.getName(), (startTime - System.currentTimeMillis()) / 10e8);
+					
+					//Close files
+					original.close();
+					copy.close();
+					
+					//Open new copy Task on background thread
+					Thread t = new Thread(new CopyTask(browseHandler.getSelection()));
+					t.setDaemon(true);
+					t.start();
+				} catch (IOException io) {
+				
+				}
+			}
 		}
 	}
-	
 }
