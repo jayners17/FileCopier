@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<fx:root minHeight="-Infinity" type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <BorderPane AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="16.0">
+         <center>
+            <ProgressBar fx:id="progressBar" maxWidth="400.0" minWidth="200.0" prefWidth="300.0" progress="0.0" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets bottom="8.0" top="8.0" />
+               </BorderPane.margin>
+            </ProgressBar>
+         </center>
+         <top>
+            <Label text="Copying Files...." BorderPane.alignment="CENTER_LEFT">
+               <BorderPane.margin>
+                  <Insets bottom="8.0" />
+               </BorderPane.margin>
+            </Label>
+         </top>
+         <bottom>
+            <HBox alignment="CENTER_RIGHT" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Button fx:id="bttn_Cancel" maxWidth="82.0" minWidth="82.0" mnemonicParsing="false" text="Cancel" />
+               </children>
+               <BorderPane.margin>
+                  <Insets top="8.0" />
+               </BorderPane.margin>
+            </HBox>
+         </bottom>
+      </BorderPane>
+   </children>
+</fx:root>
