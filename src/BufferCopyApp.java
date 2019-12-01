@@ -86,7 +86,7 @@ public class BufferCopyApp extends Application {
 						}
 					}
 					
-					System.out.printf("[%s] Elapsed Time: %.2f second(s)", f.getName(), (startTime - System.currentTimeMillis()) / 10e8);
+					System.out.printf("[%s] Elapsed Time: %f second(s)", f.getName(), (System.currentTimeMillis() - startTime) / 10e8);
 					
 					//Close files
 					original.close();

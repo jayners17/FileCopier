@@ -25,7 +25,7 @@ public class CopyTask extends Task<Void> {
 	
 	@Override
 	protected Void call() throws Exception {
-		System.out.println("Started Copy");
+		//System.out.println("Started Copy");
 		double progress = 0;
 		System.out.println(src);
 		for (File f : src){
@@ -45,7 +45,6 @@ public class CopyTask extends Task<Void> {
 					try{
 						//Copy byte to buffer
 						buff.append(original.readByte());
-						System.out.println("Wrote Byte");
 						System.out.printf("Copy Progress: %.2f%%", getProgress() * 100);
 						//Free processor up for a bit
 						Thread.sleep(100);
@@ -57,7 +56,7 @@ public class CopyTask extends Task<Void> {
 					}
 				}
 				
-				System.out.printf("[%s] Elapsed Time: %.2f second(s)", f.getName(), (startTime - System.currentTimeMillis()) / 10e8);
+				System.out.printf("[%s] Elapsed Time: %f second(s)", f.getName(), (System.currentTimeMillis() - startTime) / 10e8);
 				
 				//Close files
 				original.close();
