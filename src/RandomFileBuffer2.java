@@ -1,6 +1,7 @@
 import java.io.RandomAccessFile;
 import java.io.IOException;
 import java.io.EOFException;
+import java.util.Random;
 
 public class RandomFileBuffer2 {
 
@@ -11,9 +12,27 @@ public class RandomFileBuffer2 {
     private byte[] buffer;
     private int currR;
     private int currW;
-
+    
+    /**
+     * Controls whether the buffer automatically writes all of it's bytes to the underlying
+     * file.
+     */
     private boolean autoFlush;
-
+    
+    /**
+     * Constructs a new {@link RandomFileBuffer2} object to read and write to the {@link RandomAccessFile}
+     * specified by the {@code file} argument. An internal byte array is used as the actual working buffer.
+     * <br>
+     * The {@code autoFlush} argument specifies whether or not this buffer automatically writes itself to
+     * the underlying file once it's full. If set to {@code false}, this buffer will only write it's bytes
+     * to the file when the {@link RandomFileBuffer2#flush()} method is called and, when this buffer is
+     * full, any attempt to append to this buffer will fail.
+     *
+     * @param file the underlying {@link RandomAccessFile} this buffer operates on
+     * @param size the size of this buffer
+     * @param name the name of this buffer
+     * @param autoFlush whether this buffer should automatically flush itself once it's full
+     */
     public RandomFileBuffer2(RandomAccessFile file, int size, String name, boolean autoFlush) {
         this.file = file;
         BUFFER_SIZE = size;
@@ -25,6 +44,13 @@ public class RandomFileBuffer2 {
         this.autoFlush = autoFlush;
     }
     
+    /**
+     * Constructs a new {@link RandomFileBuffer2} object with {@code auto-flush} enabled.
+     *
+     * @param file the underlying {@link RandomAccessFile} this buffer operates on
+     * @param size the size of this buffer
+     * @param name the name of this buffer
+     */
     public RandomFileBuffer2(RandomAccessFile file, int size, String name) {
         this(file, size, name, true);
     }
@@ -57,19 +83,22 @@ public class RandomFileBuffer2 {
     /**
      * Writes all of the bytes from the internal buffer to the file and resets
      * the internal pointers.
-     * @throws IOException
      */
-    public void writeToFile() throws IOException {
-        int count = 0;
-
-        file.write(buffer);
+    private void writeToFile() {
+        try {
+            file.write(buffer);
+        } catch (IOException e) {
+            System.err.println("Error writing to file");
+            e.printStackTrace();
+        }
+        
         length = 0;
         currR = currW = 0;
 
     }
 
 
-    public void append(int value) throws IOException {
+    public void append(int value){
         if (full()) {
             writeToFile();
         }
@@ -93,12 +122,15 @@ public class RandomFileBuffer2 {
     }
     
     /**
-     * Appends the given value to the internal byte buffer, writing the buffer to the
-     * underlying file once it is full.
+     * Appends the given value to the internal byte buffer. If {@code autoFlush} is
+     * enabled and the buffer is full, the buffer will empty itself to the underlying
+     * {@link RandomAccessFile} before appending the value. Otherwise, this method
+     * will return false and the value will not be appended.
+     *
      * @param value the value to be written
-     * @throws IOException
+     * @return whether or not the operation was successful
      */
-    public boolean append(byte value) throws IOException {
+    public boolean append(byte value){
         if (full()) {
             if(autoFlush){
                 writeToFile();
@@ -152,7 +184,7 @@ public class RandomFileBuffer2 {
     /**
      * Resets the file pointer of the underlying {@link RandomAccessFile} to the
      * beginning of the file.
-     * @throws IOException
+     * @throws IOException throws exception if error occurs during seeking
      */
     public void reset() throws IOException {
         file.seek(0L);
@@ -192,10 +224,9 @@ public class RandomFileBuffer2 {
     }
     
     /**
-     * Writes any remaining bytes in this buffer to the underlying {@link RandomAccessFile}
-     * @throws IOException
+     * Writes any remaining bytes in this buffer to the underlying {@link RandomAccessFile}.
      */
-    public void flush() throws IOException {
+    public void flush(){
         writeToFile();
     }
 
