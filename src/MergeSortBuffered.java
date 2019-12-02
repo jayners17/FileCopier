@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Random;
 
 public class MergeSortBuffered {
@@ -70,11 +71,7 @@ public class MergeSortBuffered {
         for (int i = 0; i < arr.length; i++) {
             arr[i] = buff.read();
         }
-        for (int i = 0; i < 1; i++) {
-            
-        }
-
-
+        Arrays.sort(arr);
 
     }
 }
