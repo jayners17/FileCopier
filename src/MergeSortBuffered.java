@@ -76,6 +76,7 @@ public class MergeSortBuffered {
             buff.append(mergeFile.readInt());
         }
        mergeSort(buff.getBuffer());
+        buff.writeToFile();
 
     }
     public static void mergeSort(byte[] a){
