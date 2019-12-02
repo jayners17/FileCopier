@@ -70,7 +70,7 @@ public class MergeSortBuffered {
         for (int i = 0; i < arr.length; i++) {
             arr[i] = buff.read();
         }
-        for (int i = 0; i < ; i++) {
+        for (int i = 0; i < 1; i++) {
             
         }
 

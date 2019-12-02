@@ -1,5 +1,6 @@
 import javafx.animation.*;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -19,6 +20,8 @@ import java.io.RandomAccessFile;
 public class BufferCopyApp extends Application {
 	
 	private BrowseHandler browseHandler;
+	private Scene scene;
+	
 	
 	@FXML private Button bttn_Browse, bttn_Confirm, bttn_Cancel;
 	@FXML private TextField field_File;
@@ -29,7 +32,7 @@ public class BufferCopyApp extends Application {
 		loader.setController(this);
 		
 		Parent parent = loader.load();
-		Scene scene = new Scene(parent);
+		scene = new Scene(parent);
 		
 		browseHandler = new BrowseHandler(primaryStage, field_File, "Select files to copy...");
 		
@@ -62,7 +65,10 @@ public class BufferCopyApp extends Application {
 	public void onConfirm(ActionEvent e) {
 		if (browseHandler.hasSelection()) {
 			
-			for (File f : browseHandler.getSelection()) {
+			ProgressDialog dialog = new ProgressDialog("Copying Files...", browseHandler.getSelection(), scene.getWindow());
+			dialog.show();
+			
+			/*for (File f : browseHandler.getSelection()) {
 				try {
 					System.err.println();
 					
@@ -100,6 +106,51 @@ public class BufferCopyApp extends Application {
 				
 				}
 			}
+			Thread t = new Thread(() -> {
+				
+				for (File f : browseHandler.getSelection()) {
+					try {
+						System.out.println("Copy Start: " + f.getName());
+						
+						//Setup files and buffer
+						RandomAccessFile original = new RandomAccessFile(f, "r");
+						RandomAccessFile copy = new RandomAccessFile("COPY_" + f.getName(), "rw");
+						
+						RandomFileBuffer2 buff = new RandomFileBuffer2(copy, 64000, "Copy");
+						
+						long startTime = System.nanoTime();
+						
+						//Loop through each file
+						while (true) {
+							try {
+								//Copy byte to buffer
+								buff.append(original.readByte());
+								Thread.sleep(10);
+							} catch (EOFException eof) {
+								//Stop loop once eof is reached
+								break;
+							}catch (InterruptedException ie){
+								ie.printStackTrace();
+							}
+						}
+						
+						//Flush buffer
+						buff.flush();
+						long endTime = System.nanoTime();
+						System.out.printf("[%s] Elapsed Time: %f second(s)", f.getName(), (endTime - startTime) / 10e8);
+						
+						//Close files
+						original.close();
+						copy.close();
+					} catch (IOException io) {
+						io.printStackTrace();
+					}
+				}
+				
+				System.out.println("Copy Done!!!");
+				
+			});
+			Platform.runLater(t::start);*/
 		}
 	}
 }

@@ -1,36 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-
 <fx:root minHeight="-Infinity" type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <BorderPane AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="16.0">
+      <BorderPane AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="8.0" AnchorPane.rightAnchor="8.0" AnchorPane.topAnchor="8.0">
          <center>
-            <ProgressBar fx:id="progressBar" maxWidth="400.0" minWidth="200.0" prefWidth="300.0" progress="0.0" BorderPane.alignment="CENTER">
-               <BorderPane.margin>
-                  <Insets bottom="8.0" top="8.0" />
-               </BorderPane.margin>
-            </ProgressBar>
+            <GridPane>
+              <columnConstraints>
+                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="-Infinity" prefWidth="400.0" />
+                <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" minWidth="40.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <ProgressBar fx:id="progress_File" maxWidth="400.0" minWidth="200.0" prefWidth="400.0" progress="0.0" />
+                  <Label fx:id="label_fileProgress" alignment="CENTER" text="0%" GridPane.columnIndex="1" GridPane.valignment="CENTER">
+                     <padding>
+                        <Insets left="6.0" />
+                     </padding>
+                  </Label>
+                  <ProgressBar fx:id="progress_Total" maxWidth="400.0" minWidth="200.0" prefWidth="400.0" progress="0.0" GridPane.rowIndex="1" />
+                  <Label fx:id="label_totalProgress" text="0/0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                     <padding>
+                        <Insets left="6.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </GridPane>
          </center>
          <top>
-            <Label text="Copying Files...." BorderPane.alignment="CENTER_LEFT">
+            <Label fx:id="label_Status" maxWidth="400.0" textOverrun="WORD_ELLIPSIS" BorderPane.alignment="CENTER_LEFT">
                <BorderPane.margin>
-                  <Insets bottom="8.0" />
+                  <Insets bottom="8.0" top="8.0" />
                </BorderPane.margin>
             </Label>
          </top>
          <bottom>
-            <HBox alignment="CENTER_RIGHT" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <HBox alignment="CENTER_RIGHT" nodeOrientation="RIGHT_TO_LEFT" prefWidth="200.0" BorderPane.alignment="CENTER">
                <children>
                   <Button fx:id="bttn_Cancel" maxWidth="82.0" minWidth="82.0" mnemonicParsing="false" text="Cancel" />
                </children>
                <BorderPane.margin>
-                  <Insets top="8.0" />
+                  <Insets top="16.0" />
                </BorderPane.margin>
+               <padding>
+                  <Insets left="6.0" right="6.0" />
+               </padding>
             </HBox>
          </bottom>
       </BorderPane>
