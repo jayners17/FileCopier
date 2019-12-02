@@ -72,6 +72,9 @@ public class MergeSortBuffered {
         for (int i = 0; i < arr.length; i++) {
             arr[i] = buff.read();
         }*/
+        /**
+         * Fills the buffer and sorts it
+         */
         for (int i = 0; i < buff.getLength(); i++) {
             buff.append(mergeFile.readInt());
         }
