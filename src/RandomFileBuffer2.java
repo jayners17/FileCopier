@@ -28,6 +28,9 @@ public class RandomFileBuffer2 {
     public RandomFileBuffer2(RandomAccessFile file, int size, String name) {
         this(file, size, name, true);
     }
+    public byte[] getBuffer(){
+        return this.buffer;
+    }
     
     /**
      * Fills the buffer using bytes read from the connected file.
@@ -43,6 +46,7 @@ public class RandomFileBuffer2 {
             System.err.println("Error in fillBuffer()");
             ioe.printStackTrace();
         }
+
 
         length = n;
         currR = currW = 0;

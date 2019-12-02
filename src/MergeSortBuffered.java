@@ -62,7 +62,7 @@ public class MergeSortBuffered {
     }
 
     public static void sortBlock(RandomFileBuffer2 buff) throws IOException {
-        int[] arr = new int[AMT_OF_INTEGERS/4];
+        /*int[] arr = new int[AMT_OF_INTEGERS/4];
         int mid = arr.length/2;
         while (!buff.full()) {
             buff.append(mergeFile.readInt());
@@ -71,20 +71,25 @@ public class MergeSortBuffered {
         buff.fill();
         for (int i = 0; i < arr.length; i++) {
             arr[i] = buff.read();
+        }*/
+        for (int i = 0; i < buff.getLength(); i++) {
+            buff.append(mergeFile.readInt());
         }
-       mergeSort(arr);
+       mergeSort(buff.getBuffer());
 
     }
-    public static void mergeSort(int[] a){
+    public static void mergeSort(byte[] a){
         if (a.length < 2){
             return;
         }
         int mid = a.length/2;
-        int[] left = new int[mid];
-        int[] right = new int [a.length - mid];
+        byte[] left = new byte[mid];
+        byte[] right = new byte[a.length - mid];
+
+
 
         for (int i = 0; i < mid; i++) {
-            left[i] = a[i];
+            left[i] = (a[i]);
         }
         for (int i = mid; i < a.length ; i++) {
             right[i - mid] = a[i];
@@ -94,7 +99,7 @@ public class MergeSortBuffered {
 
         merge(a,left,right,mid,a.length - mid);
     }
-    public static void merge(int[] a, int [] leftArray, int[] rightArray, int left, int right){
+    public static void merge(byte[] a, byte [] leftArray, byte[] rightArray, int left, int right){
         int i = 0;
         int j = 0;
         int k = 0;
