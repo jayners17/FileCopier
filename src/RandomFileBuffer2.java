@@ -12,26 +12,33 @@ public class RandomFileBuffer2 {
     private int currR;
     private int currW;
 
+    private boolean autoFlush;
 
-    public RandomFileBuffer2(RandomAccessFile file, int size, String name) {
+    public RandomFileBuffer2(RandomAccessFile file, int size, String name, boolean autoFlush) {
         this.file = file;
         BUFFER_SIZE = size;
-        buffer = new byte[BUFFER_SIZE * 4];
+        buffer = new byte[BUFFER_SIZE];
         length = 0;
         currR = 0;
         currW = 0;
         this.name = name;
+        this.autoFlush = autoFlush;
     }
-
-    // Fill empty buffer from File
+    
+    public RandomFileBuffer2(RandomAccessFile file, int size, String name) {
+        this(file, size, name, true);
+    }
+    
+    /**
+     * Fills the buffer using bytes read from the connected file.
+     */
     public void fill() {
-
         int n = 0;
 
         try {
-
             n = file.read(buffer);
         } catch (EOFException eof) {
+            //Ignore
         } catch (IOException ioe) {
             System.err.println("Error in fillBuffer()");
             ioe.printStackTrace();
@@ -41,11 +48,14 @@ public class RandomFileBuffer2 {
         currR = currW = 0;
 
     }
-
-
-    // Writes to the File from buffer
+    
+    
+    /**
+     * Writes all of the bytes from the internal buffer to the file and resets
+     * the internal pointers.
+     * @throws IOException
+     */
     public void writeToFile() throws IOException {
-
         int count = 0;
 
         file.write(buffer);
@@ -77,17 +87,31 @@ public class RandomFileBuffer2 {
         buffer[currW++] = b4;
         length++;
     }
-
-    public void append(byte value) throws IOException {
+    
+    /**
+     * Appends the given value to the internal byte buffer, writing the buffer to the
+     * underlying file once it is full.
+     * @param value the value to be written
+     * @throws IOException
+     */
+    public boolean append(byte value) throws IOException {
         if (full()) {
-            writeToFile();
+            if(autoFlush){
+                writeToFile();
+            }else {
+                return false;
+            }
         }
 
         buffer[currW++] = value;
         length++;
+        return true;
     }
-
-
+    
+    /**
+     * Reads 4 bytes from the underlying file and returns them as an integer.
+     * @return the integer read
+     */
     public int read() {
         if (empty()) {
             fill();
@@ -113,25 +137,43 @@ public class RandomFileBuffer2 {
 
         return ((byte) Math.abs(buffer[currR++]));
     }
-
+    
+    /**
+     * Clears the buffer by resetting the internal pointers.
+     */
     public void clear() throws IOException {
         currR = currW = length = 0;
     }
-
-
+    
+    /**
+     * Resets the file pointer of the underlying {@link RandomAccessFile} to the
+     * beginning of the file.
+     * @throws IOException
+     */
     public void reset() throws IOException {
         file.seek(0L);
     }
-
-
+    
+    /**
+     * Returns the size of this buffer.
+     * @return the size of this buffer.
+     */
     public int getBufferSize() {
         return BUFFER_SIZE;
     }
-
+    
+    /**
+     * Returns the number of bytes stored in this buffer
+     * @return the number of bytes stored in this buffer.
+     */
     public int getLength() {
         return length;
     }
-
+    
+    /**
+     * Returns whether or not this buffer is empty.
+     * @return {@code true}, if this buffer is empty<br>{@code false}, if otherwise
+     */
     public boolean empty() {
         return currR == length;
     }
@@ -144,7 +186,11 @@ public class RandomFileBuffer2 {
     private String getName() {
         return name;
     }
-
+    
+    /**
+     * Writes any remaining bytes in this buffer to the underlying {@link RandomAccessFile}
+     * @throws IOException
+     */
     public void flush() throws IOException {
         writeToFile();
     }

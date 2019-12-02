@@ -62,95 +62,16 @@ public class BufferCopyApp extends Application {
 		primaryStage.show();
 	}
 	
-	public void onConfirm(ActionEvent e) {
+	/**
+	 * Called when the user clicks the {@code bttn_Confirm} {@link Button button}.
+	 * <br>
+	 * This method checks whether any files have been selected to copy and, if so,
+	 * creates a new {@link ProgressDialog} and shows it, starting the copy process.
+	 */
+	public final void onConfirm(ActionEvent e) {
 		if (browseHandler.hasSelection()) {
-			
 			ProgressDialog dialog = new ProgressDialog("Copying Files...", browseHandler.getSelection(), scene.getWindow());
 			dialog.show();
-			
-			/*for (File f : browseHandler.getSelection()) {
-				try {
-					System.err.println();
-					
-					//Setup files and buffer
-					RandomAccessFile original = new RandomAccessFile(f, "r");
-					RandomAccessFile copy = new RandomAccessFile("COPY_" + f.getName(), "rw");
-					RandomFileBuffer2 buff = new RandomFileBuffer2(copy, 6400, "Copy");
-					
-					long startTime = System.currentTimeMillis();
-					
-					//Loop through each file
-					while (true) {
-						try {
-							//Copy byte to buffer
-							buff.append(original.readByte());
-						} catch (EOFException eof) {
-							//Flush buffer
-							buff.flush();
-							//Stop loop once eof is reached
-							break;
-						}
-					}
-					
-					System.out.printf("[%s] Elapsed Time: %f second(s)", f.getName(), (System.currentTimeMillis() - startTime) / 10e8);
-					
-					//Close files
-					original.close();
-					copy.close();
-					
-					//Open new copy Task on background thread
-					Thread t = new Thread(new CopyTask(browseHandler.getSelection()));
-					t.setDaemon(true);
-					t.start();
-				} catch (IOException io) {
-				
-				}
-			}
-			Thread t = new Thread(() -> {
-				
-				for (File f : browseHandler.getSelection()) {
-					try {
-						System.out.println("Copy Start: " + f.getName());
-						
-						//Setup files and buffer
-						RandomAccessFile original = new RandomAccessFile(f, "r");
-						RandomAccessFile copy = new RandomAccessFile("COPY_" + f.getName(), "rw");
-						
-						RandomFileBuffer2 buff = new RandomFileBuffer2(copy, 64000, "Copy");
-						
-						long startTime = System.nanoTime();
-						
-						//Loop through each file
-						while (true) {
-							try {
-								//Copy byte to buffer
-								buff.append(original.readByte());
-								Thread.sleep(10);
-							} catch (EOFException eof) {
-								//Stop loop once eof is reached
-								break;
-							}catch (InterruptedException ie){
-								ie.printStackTrace();
-							}
-						}
-						
-						//Flush buffer
-						buff.flush();
-						long endTime = System.nanoTime();
-						System.out.printf("[%s] Elapsed Time: %f second(s)", f.getName(), (endTime - startTime) / 10e8);
-						
-						//Close files
-						original.close();
-						copy.close();
-					} catch (IOException io) {
-						io.printStackTrace();
-					}
-				}
-				
-				System.out.println("Copy Done!!!");
-				
-			});
-			Platform.runLater(t::start);*/
 		}
 	}
 }
