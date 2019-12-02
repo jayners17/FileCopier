@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Random;
 
 public class MergeSortBuffered {
@@ -62,6 +63,7 @@ public class MergeSortBuffered {
 
     public static void sortBlock(RandomFileBuffer2 buff) throws IOException {
         int[] arr = new int[AMT_OF_INTEGERS/4];
+        int mid = arr.length/2;
         while (!buff.full()) {
             buff.append(mergeFile.readInt());
         }
@@ -70,11 +72,46 @@ public class MergeSortBuffered {
         for (int i = 0; i < arr.length; i++) {
             arr[i] = buff.read();
         }
-        for (int i = 0; i < 1; i++) {
-            
-        }
-
-
+       mergeSort(arr);
 
     }
+    public static void mergeSort(int[] a){
+        if (a.length < 2){
+            return;
+        }
+        int mid = a.length/2;
+        int[] left = new int[mid];
+        int[] right = new int [a.length - mid];
+
+        for (int i = 0; i < mid; i++) {
+            left[i] = a[i];
+        }
+        for (int i = mid; i < a.length ; i++) {
+            right[i - mid] = a[i];
+        }
+        mergeSort(left);
+        mergeSort(right);
+
+        merge(a,left,right,mid,a.length - mid);
+    }
+    public static void merge(int[] a, int [] leftArray, int[] rightArray, int left, int right){
+        int i = 0;
+        int j = 0;
+        int k = 0;
+
+        while(i < left && j < right){
+            if (leftArray[i] <= rightArray[j]){
+                a[k++] = leftArray[i++];
+            }else{
+                a[k++] = rightArray[j++];
+            }
+        }
+        while(i < left){
+            a[k++] = leftArray[i++];
+        }
+        while(j < right){
+            a[k++] = rightArray[j++];
+        }
+    }
+
 }
