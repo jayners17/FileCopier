@@ -122,22 +122,4 @@ public class ProgressDialog extends Stage {
 		
 	}
 	
-	private void initLabelFormat(){
-		
-		StringConverter<Double> percentConverter = new StringConverter<Double>() {
-			@Override
-			public String toString(Double object) {
-				return String.format("%.2f%%", object);
-			}
-			
-			@Override
-			public Double fromString(String string) {
-				return null;
-			}
-		};
-		
-		
-		
-	}
-	
 }
