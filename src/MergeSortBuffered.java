@@ -1,3 +1,6 @@
+import jdk.internal.util.EnvUtils;
+import org.omg.CORBA.Environment;
+
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
@@ -19,14 +22,9 @@ public class MergeSortBuffered {
     public static void main(String[] args) throws IOException {
         File file1 = null;
         File fileOut = null;
-
-        try {
-            file1 = new File(FILE.toURI());
-            fileOut = new File(OUTPUT.toURI());
-        } catch (URISyntaxException e) {
-            System.err.println("Failed to load file");
-            System.exit(-1);
-        }
+        String dir = System.getProperty("user.dir");
+        file1 = new File(dir + "/mergeFile.dat");
+        fileOut = new File(dir + "/outFile.dat");
 
         //Files are located in out directory
         mergeFile = new RandomAccessFile(file1, "rw");
@@ -79,7 +77,7 @@ public class MergeSortBuffered {
             buff.append(mergeFile.readInt());
         }
        mergeSort(buff.getBuffer());
-        buff.writeToFile();
+        buff.flush();
 
     }
     public static void mergeSort(byte[] a){
