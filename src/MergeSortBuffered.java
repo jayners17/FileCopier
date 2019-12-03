@@ -32,6 +32,7 @@ public class MergeSortBuffered {
 
         //Fills file with random integers
         createFile();
+        printOriginalFile();
 
         //Creates buffers
         buffer = new RandomFileBuffer2(output, SIZE, "Merge");
@@ -41,12 +42,13 @@ public class MergeSortBuffered {
         bufferBlock4 = new RandomFileBuffer2(output, SIZE/4, "Block4");
 
 
-
         sortBlock(bufferBlock1);
         sortBlock(bufferBlock2);
         sortBlock(bufferBlock3);
         sortBlock(bufferBlock4);
 
+
+        printSortedFile();
 
         mergeFile.close();
         output.close();
@@ -120,5 +122,24 @@ public class MergeSortBuffered {
             a[k++] = rightArray[j++];
         }
     }
+
+    public static void printSortedFile() throws IOException {
+        output.seek(0);
+        System.out.print("{ ");
+        for (int i = 0; i < AMT_OF_INTEGERS-1; i++) {
+            System.out.print(output.read() + ", ");
+        }
+        System.out.print(output.read() + " }\n");
+    }
+
+    public static void printOriginalFile() throws IOException {
+        mergeFile.seek(0);
+        System.out.print("{ ");
+        for (int i = 0; i < AMT_OF_INTEGERS-1; i++) {
+            System.out.print(mergeFile.read() + ", ");
+        }
+        System.out.print(mergeFile.read() + " }\n");
+    }
+
 
 }
