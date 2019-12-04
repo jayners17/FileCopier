@@ -34,6 +34,7 @@ public class MergeSortBuffered {
         createFile();
         printOriginalFile();
 
+
         //Creates buffers
         buffer = new RandomFileBuffer2(output, SIZE, "Merge");
         bufferBlock1 = new RandomFileBuffer2(output, SIZE/4, "Block1");
@@ -59,6 +60,7 @@ public class MergeSortBuffered {
         for (int i = 0; i < AMT_OF_INTEGERS; i++) {
             mergeFile.write(random.nextInt());
         }
+        mergeFile.seek(0);
     }
 
     public static void sortBlock(RandomFileBuffer2 buff) throws IOException {
@@ -75,10 +77,15 @@ public class MergeSortBuffered {
         /**
          * Fills the buffer and sorts it
          */
-        for (int i = 0; i < buff.getLength(); i++) {
-            buff.append(mergeFile.readInt());
+        try{
+            mergeFile.seek(0);
+            while (!buff.full()) {
+                buff.append(mergeFile.readInt());
+            }
+        }catch (EOFException e){
+            e.getMessage();
         }
-       mergeSort(buff.getBuffer());
+        mergeSort(buff.getBuffer());
         buff.flush();
 
     }
@@ -109,7 +116,7 @@ public class MergeSortBuffered {
         int k = 0;
 
         while(i < left && j < right){
-            if (leftArray[i] <= rightArray[j]){
+            if (((int) leftArray[i]) <= ((int)rightArray[j])){
                 a[k++] = leftArray[i++];
             }else{
                 a[k++] = rightArray[j++];
