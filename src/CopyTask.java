@@ -59,7 +59,6 @@ public class CopyTask extends Task<List<File>> {
 					throw e;
 				}
 			}
-			
 			long startTime = System.currentTimeMillis();
 			
 			long i = 0;

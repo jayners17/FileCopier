@@ -35,7 +35,7 @@ public class RandomFileBuffer2 {
      */
     public RandomFileBuffer2(RandomAccessFile file, int size, String name, boolean autoFlush) {
         this.file = file;
-        BUFFER_SIZE = size;
+        BUFFER_SIZE = size * 4;
         buffer = new byte[BUFFER_SIZE];
         length = 0;
         currR = 0;
@@ -54,6 +54,11 @@ public class RandomFileBuffer2 {
     public RandomFileBuffer2(RandomAccessFile file, int size, String name) {
         this(file, size, name, true);
     }
+    
+    /**
+     * Returns a reference to this buffer's underlying byte array.
+     * @return the underlying byte array of this buffer
+     */
     public byte[] getBuffer(){
         return this.buffer;
     }
@@ -131,12 +136,10 @@ public class RandomFileBuffer2 {
      * @return whether or not the operation was successful
      */
     public boolean append(byte value){
-        if (full()) {
-            if(autoFlush){
-                writeToFile();
-            }else {
-                return false;
-            }
+        if (full() && autoFlush){
+            flush();
+        }else if(full() && !autoFlush){
+            return false;
         }
 
         buffer[currW++] = value;
@@ -216,7 +219,7 @@ public class RandomFileBuffer2 {
 
 
     public boolean full() {
-        return length >= BUFFER_SIZE * 4;
+        return length >= BUFFER_SIZE;
     }
 
     private String getName() {
