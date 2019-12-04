@@ -138,7 +138,7 @@ public class MergeSortBuffered {
     }
 
     public static void buffMergeSort(RandomAccessFile input) throws IOException{
-        int maxPass = input.length();
+        long maxPass = input.length();
         RandomFileBuffer2 buff1 = new RandomFileBuffer2(A, (int)input.length()/2, "A");
         RandomFileBuffer2 buff2 = new RandomFileBuffer2(B, (int)input.length()/2, "B");
         
