@@ -103,9 +103,13 @@ public class RandomFileBuffer2 {
     }
 
 
-    public void append(int value){
+    public boolean append(int value){
         if (full()) {
-            writeToFile();
+            if(autoFlush){
+                writeToFile();
+            }else {
+                return false;
+            }
         }
 
         byte b1 = (byte) (value >> 24);
@@ -124,6 +128,7 @@ public class RandomFileBuffer2 {
 
         buffer[currW++] = b4;
         length++;
+        return true;
     }
     
     /**
