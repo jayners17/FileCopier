@@ -12,133 +12,70 @@ import java.util.Random;
 
 public class MergeSortBuffered {
 
-    public static RandomAccessFile mergeFile, output;
+    public static RandomAccessFile mergeFile;
     public static RandomAccessFile A, B;
-    public static RandomFileBuffer2 buffer, bufferBlock1, bufferBlock2, bufferBlock3, bufferBlock4;
-    
-    public static final int SIZE = 20 * Integer.BYTES;
+
+    public static final int SIZE = 8 * Integer.BYTES;
     public static final int AMT_OF_INTEGERS = SIZE / Integer.BYTES;
 
     public static void main(String[] args) throws IOException {
+        File file = null;
         File file1 = null;
-        File fileOut = null;
+        File file2 = null;
         String dir = System.getProperty("user.dir");
-        file1 = new File(dir + "/mergeFile.dat");
-        fileOut = new File(dir + "/outFile.dat");
+        file = new File(dir + "/mergeFile.dat");
+        file1 = new File(dir + "/aFile.dat");
+        file2 = new File(dir + "/bFile.dat");
 
         //Files are located in out directory
-        mergeFile = new RandomAccessFile(file1, "rw");
-        output = new RandomAccessFile(fileOut, "rw");
+        mergeFile = new RandomAccessFile(file, "rw");
+        A = new RandomAccessFile(file1, "rw");
+        B = new RandomAccessFile(file2, "rw");
+
 
         //Fills file with random integers
         createFile();
         printOriginalFile();
-        
-        //Creates buffers
-        buffer = new RandomFileBuffer2(output, SIZE, "Merge");
-        bufferBlock1 = new RandomFileBuffer2(output, SIZE/4, "Block1");
-        bufferBlock2 = new RandomFileBuffer2(output, SIZE/4, "Block2");
-        bufferBlock3 = new RandomFileBuffer2(output, SIZE/4, "Block3");
-        bufferBlock4 = new RandomFileBuffer2(output, SIZE/4, "Block4");
-        
-        sortBlock(bufferBlock1);
-        sortBlock(bufferBlock2);
-        sortBlock(bufferBlock3);
-        sortBlock(bufferBlock4);
-        
+
+        //Sorts file
+        buffMergeSort(mergeFile);
+
+        //Prints sorted file
         printSortedFile();
 
         mergeFile.close();
-        output.close();
+        A.close();
+        B.close();
     }
 
     public static void createFile() throws IOException {
         Random random = new Random();
         for (int i = 0; i < AMT_OF_INTEGERS; i++) {
-            mergeFile.writeInt(random.nextInt(255) + 1);
+            mergeFile.writeInt(random.nextInt());
         }
         mergeFile.seek(0);
     }
 
-    public static void sortBlock(RandomFileBuffer2 buff) throws IOException {
-        /*
-         * Fills the buffer and sorts it
-         */
-        try{
-            mergeFile.seek(0);
-            while (!buff.full()) {
-                buff.append(mergeFile.readInt());
-            }
-        }catch (EOFException e){
-            e.getMessage();
-        }
-        mergeSort(buff.getBuffer());
-        buff.flush();
-    }
-    
-    public static void mergeSort(byte[] a){
-        if (a.length < 2){
-            return;
-        }
-        
-        int mid = a.length/2;
-        byte[] left = new byte[mid];
-        byte[] right = new byte[a.length - mid];
-
-        for (int i = 0; i < mid; i++) {
-            left[i] = (a[i]);
-        }
-        
-        for (int i = mid; i < a.length ; i++) {
-            right[i - mid] = a[i];
-        }
-        
-        mergeSort(left);
-        mergeSort(right);
-        
-        merge(a,left,right,mid,a.length - mid);
-    }
-    
-    public static void merge(byte[] a, byte [] leftArray, byte[] rightArray, int left, int right){
-        int i = 0;
-        int j = 0;
-        int k = 0;
-
-        while(i < left && j < right){
-            if (((int) leftArray[i]) <= ((int)rightArray[j])){
-                a[k++] = leftArray[i++];
-            }else{
-                a[k++] = rightArray[j++];
-            }
-        }
-        while(i < left){
-            a[k++] = leftArray[i++];
-        }
-        while(j < right){
-            a[k++] = rightArray[j++];
-        }
-    }
-
     public static void printSortedFile() throws IOException {
-        output.seek(0);
+        mergeFile.seek(0);
         System.out.print("Sorted: { ");
         for (int i = 0; i < AMT_OF_INTEGERS-1; i++) {
-            System.out.print(output.readUnsignedByte() + ", ");
+            System.out.print(mergeFile.read() + ", ");
         }
-        System.out.print(output.readUnsignedByte() + " }\n");
+        System.out.print(mergeFile.read() + " }\n");
     }
 
     public static void printOriginalFile() throws IOException {
         mergeFile.seek(0);
         System.out.print("Original: { ");
         for (int i = 0; i < AMT_OF_INTEGERS-1; i++) {
-            System.out.print(mergeFile.readUnsignedByte() + ", ");
+            System.out.print(mergeFile.read() + ", ");
         }
-        System.out.print(mergeFile.readUnsignedByte() + " }\n");
+        System.out.print(mergeFile.read() + " }\n");
     }
 
     public static void buffMergeSort(RandomAccessFile input) throws IOException{
-        long maxPass = input.length();
+        int maxPass = (int)Math.round(Math.log(AMT_OF_INTEGERS) / Math.log(2));
         RandomFileBuffer2 buff1 = new RandomFileBuffer2(A, (int)input.length()/2, "A");
         RandomFileBuffer2 buff2 = new RandomFileBuffer2(B, (int)input.length()/2, "B");
         
@@ -192,10 +129,10 @@ public class MergeSortBuffered {
     private static void spilt(RandomAccessFile input, RandomFileBuffer2 a, RandomFileBuffer2 b, int n) throws IOException {
         for (int i = 0; i < SIZE / (2 * n); i++) {
             for (int j = 0; j < n; j++) {
-                a.append(input.readInt());
+                a.append(input.read());
             }
             for (int k = 0; k < n; k++) {
-                b.append(input.readInt());
+                b.append(input.read());
             }
         }
     }
