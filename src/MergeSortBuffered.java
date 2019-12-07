@@ -59,14 +59,14 @@ public class MergeSortBuffered {
     public static void createFile() throws IOException {
         Random random = new Random();
         for (int i = 0; i < AMT_OF_INTEGERS; i++) {
-            mergeFile.writeInt(random.nextInt());
+            mergeFile.writeInt(random.nextInt(255) + 1);
         }
     }
 
     public static void printFile(RandomAccessFile file, int size) throws IOException {
         file.seek(0);
         for (int i = 0; i < size ; i++) {
-            System.out.print(file.read() + " ");
+            System.out.print(file.readInt() + " ");
         }
         file.seek(0);
 
@@ -76,30 +76,29 @@ public class MergeSortBuffered {
         mergeFile.seek(0);
         System.out.print("Sorted: { ");
         for (int i = 0; i < AMT_OF_INTEGERS-1; i++) {
-            System.out.print(mergeFile.read() + ", ");
+            System.out.print(mergeFile.readInt() + ", ");
         }
-        System.out.print(mergeFile.read() + " }\n");
+        System.out.print(mergeFile.readInt() + " }\n");
     }
 
     public static void printOriginalFile() throws IOException {
         mergeFile.seek(0);
         System.out.print("Original: { ");
         for (int i = 0; i < AMT_OF_INTEGERS-1; i++) {
-            System.out.print(mergeFile.read() + ", ");
+            System.out.print(mergeFile.readInt() + ", ");
         }
-        System.out.print(mergeFile.read() + " }\n");
+        System.out.print(mergeFile.readInt() + " }\n");
     }
 
     public static void buffMergeSort() throws IOException{
         int maxPass = (int)Math.round(Math.log(AMT_OF_INTEGERS) / Math.log(2));
 
         for(int pass = 0, count = 1; pass < maxPass; pass++, count += pass){
-           spilt(count);
-           merge(count);
-       }
-       
+            spilt(count);
+            merge(count);
+        }
     }
-    
+
     private static void merge(int n) throws IOException {
         mergeFile.seek(0);
         fileA.seek(0);
@@ -109,7 +108,7 @@ public class MergeSortBuffered {
         int aCount = 0, bCount = 0;
         for (int i = 0; i < (AMT_OF_INTEGERS / (2 * n)); i++) {
             aCount = bCount = n;
-            
+
             a = fileA.readInt();
             b = fileB.readInt();
 
@@ -128,28 +127,24 @@ public class MergeSortBuffered {
                     }
                 }
             }
-            
+
             while (aCount-- != 0){
                 buffF.append(a);
                 if(aCount != 0){
                     a = fileA.readInt();
                 }
             }
-    
+
             while (bCount-- != 0){
                 buffF.append(b);
                 if(bCount != 0){
                     b = fileB.readInt();
                 }
             }
-            buffF.flush();
         }
-
-        System.out.println("\nF");
-        printFile(mergeFile, 8);
-
+        buffF.flush();
     }
-    
+
     private static void spilt(int n) throws IOException {
         mergeFile.seek(0);
         fileA.seek(0);
@@ -157,22 +152,16 @@ public class MergeSortBuffered {
 
         for (int i = 0; i < AMT_OF_INTEGERS / (n * 2); i++) {
             for (int j = 0; j < n; j++) {
-                //fileA.writeInt(mergeFile.readInt());
                 buffA.append(mergeFile.readInt());
 
             }
             for (int k = 0; k < n; k++) {
-                //fileB.writeInt(mergeFile.readInt());
                 buffB.append(mergeFile.readInt());
             }
         }
         buffA.flush();
         buffB.flush();
-
-        System.out.println("\nA");
-        printFile(fileA, 4);
-        System.out.println("\nB");
-        printFile(fileB, 4);
     }
-    
+
 }
+

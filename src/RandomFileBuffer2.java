@@ -35,8 +35,8 @@ public class RandomFileBuffer2 {
      */
     public RandomFileBuffer2(RandomAccessFile file, int size, String name, boolean autoFlush) {
         this.file = file;
-        BUFFER_SIZE = size * 4;
-        buffer = new byte[BUFFER_SIZE];
+        BUFFER_SIZE = size;
+        buffer = new byte[BUFFER_SIZE * 4];
         length = 0;
         currR = 0;
         currW = 0;
