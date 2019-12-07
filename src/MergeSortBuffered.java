@@ -12,8 +12,9 @@ import java.util.Random;
 
 public class MergeSortBuffered {
 
-    public static RandomAccessFile mergeFile;
-    public static RandomAccessFile A, B;
+    public static RandomAccessFile mergeFile, fileA, fileB;
+    public static RandomFileBuffer2 buffA, buffB, buffF;
+
 
     public static final int SIZE = 8 * Integer.BYTES;
     public static final int AMT_OF_INTEGERS = SIZE / Integer.BYTES;
@@ -27,10 +28,17 @@ public class MergeSortBuffered {
         file1 = new File(dir + "/aFile.dat");
         file2 = new File(dir + "/bFile.dat");
 
+
+
         //Files are located in out directory
         mergeFile = new RandomAccessFile(file, "rw");
-        A = new RandomAccessFile(file1, "rw");
-        B = new RandomAccessFile(file2, "rw");
+        fileA = new RandomAccessFile(file1, "rw");
+        fileB = new RandomAccessFile(file2, "rw");
+
+        buffA = new RandomFileBuffer2(fileA, SIZE/2, "A");
+        buffB = new RandomFileBuffer2(fileB, SIZE/2, "B");
+        buffF = new RandomFileBuffer2(mergeFile, SIZE, "F");
+
 
 
         //Fills file with random integers
@@ -38,22 +46,40 @@ public class MergeSortBuffered {
         printOriginalFile();
 
         //Sorts file
-        buffMergeSort(mergeFile);
+        buffMergeSort();
 
         //Prints sorted file
         printSortedFile();
 
         mergeFile.close();
-        A.close();
-        B.close();
+        fileA.close();
+        fileB.close();
     }
 
     public static void createFile() throws IOException {
-        Random random = new Random();
-        for (int i = 0; i < AMT_OF_INTEGERS; i++) {
-            mergeFile.writeInt(random.nextInt());
+//        Random random = new Random();
+//        for (int i = 0; i < AMT_OF_INTEGERS; i++) {
+//            mergeFile.writeInt(random.nextInt());
+//        }
+        mergeFile.write(120);
+        mergeFile.write(60);
+        mergeFile.write(130);
+        mergeFile.write(90);
+        mergeFile.write(50);
+        mergeFile.write(170);
+        mergeFile.write(10);
+        mergeFile.write(100);
+
+
+    }
+
+    public static void printFile(RandomAccessFile file, int size) throws IOException {
+        file.seek(0);
+        for (int i = 0; i < size ; i++) {
+            System.out.print(file.read() + " ");
         }
-        mergeFile.seek(0);
+        file.seek(0);
+
     }
 
     public static void printSortedFile() throws IOException {
@@ -74,67 +100,88 @@ public class MergeSortBuffered {
         System.out.print(mergeFile.read() + " }\n");
     }
 
-    public static void buffMergeSort(RandomAccessFile input) throws IOException{
+    public static void buffMergeSort() throws IOException{
         int maxPass = (int)Math.round(Math.log(AMT_OF_INTEGERS) / Math.log(2));
-        RandomFileBuffer2 buff1 = new RandomFileBuffer2(A, (int)input.length()/2, "A");
-        RandomFileBuffer2 buff2 = new RandomFileBuffer2(B, (int)input.length()/2, "B");
-        
-        for(int pass = 0, count = 1; pass < maxPass; pass++, count +=2){
-           spilt(input, buff1, buff2, count);
-           merge(input, buff1, buff2, count);
+
+        for(int pass = 0, count = 1; pass < maxPass; pass++, count += pass){
+           spilt(count);
+           merge(count);
        }
        
     }
     
-    private static void merge(RandomAccessFile input, RandomFileBuffer2 A, RandomFileBuffer2 B, int n) throws IOException {
+    private static void merge(int n) throws IOException {
+        mergeFile.seek(0);
+        fileA.seek(0);
+        fileB.seek(0);
+
         int a, b;
-        int aCount = 0, bCount = 0;
-        for (int i = 0; i < SIZE / (2 * n); i++) {
+        int aCount, bCount;
+        for (int i = 0; i < AMT_OF_INTEGERS / (2 * n); i++) {
             aCount = bCount = n;
             
-            a = A.read();
-            b = B.read();
+            a = fileA.readInt();
+            b = fileB.readInt();
+
             while (aCount != 0 && bCount != 0){
                 if(a<b){
-                    input.write(a);
+                    buffF.append(a);
                     aCount--;
                     if(aCount != 0){
-                        a = A.read();
+                        a = fileA.readInt();
                     }
                 }else{
-                    input.write(b);
+                    buffF.append(b);
                     bCount--;
                     if(bCount != 0){
-                        b = B.read();
+                        b = fileB.readInt();
                     }
                 }
             }
             
             while (aCount-- != 0){
-                input.writeInt(a);
+                buffF.append(a);
                 if(aCount != 0){
-                    a = A.read();
+                    a = fileA.readInt();
                 }
             }
     
             while (bCount-- != 0){
-                input.writeInt(b);
+                buffF.append(b);
                 if(bCount != 0){
-                    b = B.read();
+                    b = fileB.readInt();
                 }
             }
         }
+        buffF.flush();
+        System.out.println("\nF");
+        printFile(mergeFile, 8);
+
     }
     
-    private static void spilt(RandomAccessFile input, RandomFileBuffer2 a, RandomFileBuffer2 b, int n) throws IOException {
-        for (int i = 0; i < SIZE / (2 * n); i++) {
+    private static void spilt(int n) throws IOException {
+        mergeFile.seek(0);
+        fileA.seek(0);
+        fileB.seek(0);
+
+        for (int i = 0; i < AMT_OF_INTEGERS / (n * 2); i++) {
             for (int j = 0; j < n; j++) {
-                a.append(input.read());
+                //fileA.writeInt(mergeFile.readInt());
+                buffA.append(mergeFile.readInt());
+
             }
             for (int k = 0; k < n; k++) {
-                b.append(input.read());
+                //fileB.writeInt(mergeFile.readInt());
+                buffB.append(mergeFile.readInt());
             }
         }
+        buffA.flush();
+        buffB.flush();
+
+        System.out.println("\nA");
+        printFile(fileA, 4);
+        System.out.println("\nB");
+        printFile(fileB, 4);
     }
     
 }
