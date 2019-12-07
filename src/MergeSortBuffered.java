@@ -57,20 +57,10 @@ public class MergeSortBuffered {
     }
 
     public static void createFile() throws IOException {
-//        Random random = new Random();
-//        for (int i = 0; i < AMT_OF_INTEGERS; i++) {
-//            mergeFile.writeInt(random.nextInt());
-//        }
-        mergeFile.write(120);
-        mergeFile.write(60);
-        mergeFile.write(130);
-        mergeFile.write(90);
-        mergeFile.write(50);
-        mergeFile.write(170);
-        mergeFile.write(10);
-        mergeFile.write(100);
-
-
+        Random random = new Random();
+        for (int i = 0; i < AMT_OF_INTEGERS; i++) {
+            mergeFile.writeInt(random.nextInt());
+        }
     }
 
     public static void printFile(RandomAccessFile file, int size) throws IOException {
@@ -115,9 +105,9 @@ public class MergeSortBuffered {
         fileA.seek(0);
         fileB.seek(0);
 
-        int a, b;
-        int aCount, bCount;
-        for (int i = 0; i < AMT_OF_INTEGERS / (2 * n); i++) {
+        int a = 0, b = 0;
+        int aCount = 0, bCount = 0;
+        for (int i = 0; i < (AMT_OF_INTEGERS / (2 * n)); i++) {
             aCount = bCount = n;
             
             a = fileA.readInt();
@@ -152,8 +142,9 @@ public class MergeSortBuffered {
                     b = fileB.readInt();
                 }
             }
+            buffF.flush();
         }
-        buffF.flush();
+
         System.out.println("\nF");
         printFile(mergeFile, 8);
 
