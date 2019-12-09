@@ -93,7 +93,7 @@ public class MergeSortBuffered {
     public static void buffMergeSort() throws IOException{
         int maxPass = (int)Math.round(Math.log(AMT_OF_INTEGERS) / Math.log(2));
 
-        for(int pass = 0, count = 1; pass < maxPass; pass++, count += pass){
+        for(int pass = 0, count = 1; pass < maxPass; pass++, count = (int)Math.pow(2, pass)){
             spilt(count);
             merge(count);
         }
